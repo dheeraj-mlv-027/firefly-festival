@@ -1,5 +1,13 @@
 # Firefly Festival Simulation - Edge Assignment
 
+## Clone the repo 
+```
+git clone https://github.com/dheeraj-mlv-027/firefly-festival.git
+
+cd firefly-festival
+
+```
+
 ## Installation 
 
 ```bash
