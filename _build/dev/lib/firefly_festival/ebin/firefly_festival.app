@@ -1,0 +1,1 @@
+{application,firefly_festival,[{modules,['Elixir.FireflyFestival','Elixir.FireflyFestival.Config','Elixir.FireflyFestival.Display','Elixir.FireflyFestival.Firefly']},{optional_applications,[]},{applications,[kernel,stdlib,elixir,logger]},{description,"firefly_festival"},{registered,[]},{vsn,"0.1.0"}]}.
