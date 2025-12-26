@@ -1,7 +1,7 @@
 defmodule FireflyFestival.Firefly do
   @moduledoc "Individual firefly process with internal clock and state"
 
-  defstruct [:id, :left_neighbor, :all_fireflies, :config, :state, :time_remaining]
+  defstruct [:id, :left_neighbor, :all_fireflies, :config, :state, :time_remaining,:display_pid]
 
   @doc "Starts a new firefly process with given id and configuration"
   def start_link(id, config) do
@@ -17,7 +17,8 @@ defmodule FireflyFestival.Firefly do
     state: :off,
     time_remaining: initial_time,
     left_neighbor: nil,
-    all_fireflies: []
+    all_fireflies: [],
+    display_pid: nil
   }
 
     schedule_tick(config)
@@ -38,8 +39,12 @@ defmodule FireflyFestival.Firefly do
         new_state = handle_blink_message(state, from_id)
         loop(new_state)
 
-      {:get_state, caller} ->
-        send(caller, {:state, state.id, state.state})
+      # {:get_state, caller} ->
+      #   send(caller, {:state, state.id, state.state})
+      #   loop(state)
+
+      {:update_display_pid,display_pid}->
+        state=%{state | display_pid: display_pid}
         loop(state)
 
       :stop ->
@@ -58,9 +63,11 @@ defmodule FireflyFestival.Firefly do
       case state.state do
         :off ->
           broadcast_blink(state)
+          send(state.display_pid,{:state, state.id,:on})
           %{state | state: :on, time_remaining: state.config.on_duration}
 
         :on ->
+          send(state.display_pid,{:state, state.id,:off})
           %{state | state: :off, time_remaining: state.config.off_duration}
       end
     else

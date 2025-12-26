@@ -17,13 +17,11 @@ defmodule FireflyFestival do
       adjustment_delta: adjustment_delta,
       output_frequency: output_frequency,
       clock_tick_rate: clock_tick_rate
-    }
-
-    Process.sleep(2000)
-
+  }
     firefly_pids = start_fireflies(config)
     setup_neighbors(firefly_pids, config)
-    FireflyFestival.Display.start_link(firefly_pids, config)
+    display_pid=FireflyFestival.Display.start_link(firefly_pids, config)
+    update_display_pid(firefly_pids,display_pid)
     Process.sleep(:infinity)
   end
 
@@ -45,9 +43,6 @@ defmodule FireflyFestival do
       output_frequency: output_frequency,
       clock_tick_rate: clock_tick_rate
     }
-
-    Process.sleep(1000)
-
     firefly_pids = start_fireflies(config)
     setup_neighbors(firefly_pids, config)
     display_pid = FireflyFestival.Display.start_link(firefly_pids, config)
@@ -66,10 +61,18 @@ defmodule FireflyFestival do
     end)
   end
 
+
   defp setup_neighbors(firefly_pids, config) do
     Enum.each(firefly_pids, fn {id, pid} ->
       left_neighbor_id = if id == 1, do: config.no_of_fireflies, else: id - 1
       send(pid, {:set_neighbors, left_neighbor_id, firefly_pids})
     end)
   end
+
+  defp update_display_pid(firefly_pids,display_pid) do
+    Enum.each(firefly_pids,fn {_id,pid}->
+      send(pid,{:update_display_pid,display_pid})
+    end)
+  end
+
 end
